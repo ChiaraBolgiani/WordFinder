@@ -16,20 +16,24 @@ namespace WordFinder
 
             Console.WriteLine("\n----WordFinder----\n");
 
-            string query = "coffee";
+            string query = "bean";
+            
             var queryFinder = new QueryFinder();
-            var filesWithQuery = queryFinder.FindWordInFiles(query, wordsDatabase);
-
-            Console.WriteLine($"Query: {query}");
-            foreach(var file in filesWithQuery)
-                Console.WriteLine($"{file.Key} : {file.Value}");
-
             var fileSorting = new FileSorting(new OrderByDescending());
-            var sortedFiles = fileSorting.OrderFiles(filesWithQuery);
-
-            Console.WriteLine();
-            foreach (var file in sortedFiles)
-                Console.WriteLine($"{file.Key} : {file.Value}");
+            var documentsSearcher = new DocumentsSearcher(queryFinder, fileSorting);
+            
+            Console.WriteLine($"Query: {query}");
+            try
+            {
+                var topFiles = documentsSearcher.FindTopFilesWithQuery(wordsDatabase, query, 10);
+                foreach (var file in topFiles)
+                    Console.WriteLine($"{file.Key} : {file.Value}");
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            
         }
     }
 }
