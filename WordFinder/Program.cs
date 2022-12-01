@@ -1,4 +1,5 @@
-﻿using WordFinder.WordCounter;
+﻿using WordFinder.SortingStrategies;
+using WordFinder.WordCounter;
 
 namespace WordFinder
 {
@@ -21,6 +22,13 @@ namespace WordFinder
 
             Console.WriteLine($"Query: {query}");
             foreach(var file in filesWithQuery)
+                Console.WriteLine($"{file.Key} : {file.Value}");
+
+            var fileSorting = new FileSorting(new OrderByDescending());
+            var sortedFiles = fileSorting.OrderFiles(filesWithQuery);
+
+            Console.WriteLine();
+            foreach (var file in sortedFiles)
                 Console.WriteLine($"{file.Key} : {file.Value}");
         }
     }
