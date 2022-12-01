@@ -5,35 +5,69 @@ namespace WordFinder
 {
     internal class Program
     {
+        private static bool _cancelled = false;
+
         static void Main()
         {
-            var filePath = @"C:\Users\Chiara\Desktop\TestData";
-            var files = Directory.GetFiles(filePath, "*.txt", SearchOption.AllDirectories);
-            Console.WriteLine($"{files.Length} text files found");
+            string[] arguments = Environment.GetCommandLineArgs();
+            if (arguments.Length < 2)
+            {
+                Console.WriteLine("Provide the path to the directory containing text files");
+                Console.WriteLine("Usage: WordFinder.exe <pathToDirectory>");
+                return;
+            }
+
+            //find all text files in directory
+            var directory = arguments[1];
+            var files = Directory.GetFiles(directory, "*.txt", SearchOption.AllDirectories);
+            Console.WriteLine($"Found {files.Length} text files.");
 
             //create words database for all files
             var wordsDatabase = WordOccurrenceCounter.GetWordOccurrenceAllFiles(files);
 
+            //setup
             Console.WriteLine("\n----WordFinder----\n");
-
-            string query = "bean";
-            
-            var queryFinder = new QueryFinder();
             var fileSorting = new FileSorting(new OrderByDescending());
-            var documentsSearcher = new DocumentsSearcher(queryFinder, fileSorting);
-            
-            Console.WriteLine($"Query: {query}");
-            try
+            var querFinder = new QueryFinder();
+            var searcher = new DocumentsSearcher(querFinder, fileSorting);
+
+            //word search
+            while (!_cancelled)
             {
-                var topFiles = documentsSearcher.FindTopFilesWithQuery(wordsDatabase, query, 10);
-                foreach (var file in topFiles)
-                    Console.WriteLine($"{file.Key} : {file.Value}");
+                Console.Write("Search: ");
+                var query = Console.ReadLine();
+                try
+                {
+                    if (string.IsNullOrEmpty(query))
+                        throw new ArgumentException($"\nEnter a valid query");
+
+                    var results = searcher.FindTopFilesWithQuery(wordsDatabase, query, 10);
+                    Console.WriteLine("Word found in the following file(s):");
+                    foreach (var file in results)
+                        Console.WriteLine($"{file.Key} : {file.Value}");
+                }
+                catch (NoMatchFoundException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+
+                Console.WriteLine("\nPress Ctrl-C to stop searching.");
             }
-            catch(Exception ex)
+
+            //Ctrl-C to stop application
+            Console.CancelKeyPress += new ConsoleCancelEventHandler(Console_CancelKeyPress!);
+        }
+
+        static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
+        {
+            if (e.SpecialKey == ConsoleSpecialKey.ControlC)
             {
-                Console.WriteLine(ex.Message);
+                _cancelled = true;
             }
-            
         }
     }
 }
