@@ -14,6 +14,14 @@ namespace WordFinder
             var wordsDatabase = WordOccurrenceCounter.GetWordOccurrenceAllFiles(files);
 
             Console.WriteLine("\n----WordFinder----\n");
+
+            string query = "coffee";
+            var queryFinder = new QueryFinder();
+            var filesWithQuery = queryFinder.FindWordInFiles(query, wordsDatabase);
+
+            Console.WriteLine($"Query: {query}");
+            foreach(var file in filesWithQuery)
+                Console.WriteLine($"{file.Key} : {file.Value}");
         }
     }
 }
