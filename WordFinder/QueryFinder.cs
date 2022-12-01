@@ -1,6 +1,6 @@
 ﻿namespace WordFinder
 {
-    public class QueryFinder
+    public class QueryFinder : IQueryFinder
     {
         public Dictionary<string, int> FindWordInFiles(string query, Dictionary<string, FileContent> wordsDatabase)
         {

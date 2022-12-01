@@ -2,7 +2,7 @@
 
 namespace WordFinder
 {
-    public class FileSorting
+    public class FileSorting : IFileSorting
     {
         private ISortingStategy _strategy;
         public FileSorting(ISortingStategy strategy)
